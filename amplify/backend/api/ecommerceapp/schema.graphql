@@ -1,0 +1,86 @@
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
+
+# This "input" configures a global authorization rule to enable public access to
+# all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
+input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
+
+type Query {
+	getProductsById(productId: ID!): Products @function(name:"e-commerce-api-lambda")
+	listAllProducts: [Products] @function(name:"e-commerce-api-lambda")
+	
+	# Fetch a single ProductTaxonomyAttribute by TaxonomyId
+    getProductTaxonomyById(TaxonomyId: ID!): ProductTaxonomyAttribute @function(name:"e-commerce-api-lambda")
+
+    # List all ProductTaxonomyAttributes, optionally filtered by ParentId
+    listAllProductTaxonomies: [ProductTaxonomyAttribute] @function(name:"e-commerce-api-lambda")
+}
+
+input CreateProductInput {
+	name: String!,
+	description: String,
+	price: Float!,
+	category: String!,
+	stock: Int!
+}
+
+input UpdateProductInput {
+	productId: ID!,
+	name: String!,
+	description: String,
+	price: Float!,
+	category: String!,
+	stock: Int!
+}
+
+type Mutation {
+    createProduct(input: CreateProductInput): Products @function(name:"e-commerce-api-lambda")
+    
+	updateProduct(input: UpdateProductInput): Products @function(name:"e-commerce-api-lambda")
+    
+	deleteProduct(productId: ID!): String @function(name:"e-commerce-api-lambda")
+
+	# Create a new ProductTaxonomyAttribute 
+    createProductTaxonomy(input: CreateProductTaxonomyInput!): ProductTaxonomyAttribute @function(name:"e-commerce-api-lambda")
+
+    # Update an existing ProductTaxonomyAttribute
+    updateProductTaxonomy(input: UpdateProductTaxonomyInput!): ProductTaxonomyAttribute @function(name:"e-commerce-api-lambda")
+
+    # Delete a ProductTaxonomyAttribute by TaxonomyId
+    deleteProductTaxonomy(TaxonomyId: ID!): String @function(name:"e-commerce-api-lambda")
+}
+
+type Products @model(queries: { get: null, list:null }, mutations: {create:null, update:null, delete:null},subscriptions: null) {
+	productId: ID! @primaryKey
+	name: String!
+	description: String
+	price: Float
+	category: String
+	stock: Int
+	createdAt: AWSDateTime
+	updatedAt: AWSDateTime
+}
+
+input CreateProductTaxonomyInput {
+    name: String!
+    description: String
+    parentId: String
+    type: String!
+}
+
+input UpdateProductTaxonomyInput {
+    taxonomyId: ID!
+    name: String
+    description: String
+    parentId: String
+    type: String
+}
+
+type ProductTaxonomyAttribute @model(queries: { get: null, list:null }, mutations: { create:null, update:null, delete:null }, subscriptions: null){
+    taxonomyId: ID! @primaryKey
+    name: String!
+    description: String
+    parentId: String @index(name: "ParentIndex", sortKeyFields: ["name"])
+    type: String!
+}
