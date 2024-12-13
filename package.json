@@ -2,5 +2,10 @@
   "dependencies": {
     "@angular/cli": "^19.0.4",
     "aws-amplify": "^6.10.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "eslint": "^9.16.0",
+    "globals": "^15.13.0"
   }
 }
